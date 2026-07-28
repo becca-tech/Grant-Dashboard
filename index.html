@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SUNI Grant Timeline</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --cream: #F7F3EC;
+    --dark: #1C1B18;
+    --moss: #5C6B3A;
+    --terracotta: #C2623F;
+    --gold: #D4A847;
+    --slate: #4A5568;
+    --mist: #E8EBE4;
+    --urgent: #B83A2E;
+    --mid: #C2623F;
+    --future: #5C6B3A;
+    --prep: #4A5568;
+    --border: rgba(28,27,24,0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--dark);
+    min-height: 100vh;
+  }
+
+  header {
+    background: var(--dark);
+    color: var(--cream);
+    padding: 28px 40px 24px;
+    border-bottom: 3px solid var(--terracotta);
+  }
+
+  header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.9rem;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+  }
+
+  header h1 em {
+    color: var(--gold);
+    font-style: italic;
+  }
+
+  header p {
+    margin-top: 6px;
+    font-size: 0.82rem;
+    font-weight: 300;
+    color: rgba(247,243,236,0.65);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .stats-bar {
+    display: flex;
+    gap: 0;
+    background: var(--mist);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .stat {
+    flex: 1;
+    padding: 14px 20px;
+    border-right: 1px solid var(--border);
+    text-align: center;
+  }
+
+  .stat:last-child { border-right: none; }
+
+  .stat .num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.6rem;
+    line-height: 1;
+  }
+
+  .stat .label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--slate);
+    margin-top: 3px;
+    font-weight: 500;
+  }
+
+  .stat.urgent .num { color: var(--urgent); }
+  .stat.mid .num { color: var(--mid); }
+  .stat.future .num { color: var(--future); }
+  .stat.total .num { color: var(--dark); }
+
+  /* Controls */
+  .controls {
+    padding: 16px 40px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    background: white;
+  }
+
+  .controls span {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--slate);
+    font-weight: 600;
+    margin-right: 4px;
+  }
+
+  .filter-btn {
+    padding: 5px 14px;
+    border-radius: 20px;
+    border: 1.5px solid var(--border);
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    color: var(--dark);
+  }
+
+  .filter-btn:hover { border-color: var(--terracotta); color: var(--terracotta); }
+  .filter-btn.active { background: var(--dark); color: var(--cream); border-color: var(--dark); }
+
+  /* Main layout */
+  .main {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    min-height: calc(100vh - 200px);
+  }
+
+  /* Sidebar legend */
+  .sidebar {
+    padding: 28px 24px;
+    border-right: 1px solid var(--border);
+    background: white;
+  }
+
+  .sidebar h3 {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--slate);
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 12px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .legend-item:hover { background: var(--mist); }
+  .legend-item.active { border-color: var(--border); background: var(--cream); }
+
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-top: 3px;
+    flex-shrink: 0;
+  }
+
+  .legend-text strong {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 600;
+  }
+
+  .legend-text span {
+    font-size: 0.75rem;
+    color: var(--slate);
+    line-height: 1.3;
+  }
+
+  .sidebar-section {
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .action-item {
+    margin-bottom: 10px;
+    padding: 10px 12px;
+    background: var(--mist);
+    border-radius: 6px;
+    border-left: 3px solid var(--terracotta);
+  }
+
+  .action-item strong {
+    font-size: 0.8rem;
+    display: block;
+    font-weight: 600;
+  }
+
+  .action-item span {
+    font-size: 0.73rem;
+    color: var(--slate);
+    line-height: 1.4;
+  }
+
+  /* Timeline */
+  .timeline-container {
+    padding: 28px 36px;
+    overflow-y: auto;
+  }
+
+  .phase-block {
+    margin-bottom: 36px;
+  }
+
+  .phase-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .phase-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 3px;
+    color: white;
+  }
+
+  .phase-label.urgent { background: var(--urgent); }
+  .phase-label.summer { background: var(--mid); }
+  .phase-label.fall { background: var(--moss); }
+  .phase-label.next-year { background: var(--slate); }
+  .phase-label.rolling { background: var(--dark); }
+
+  .phase-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .phase-date {
+    font-size: 0.75rem;
+    color: var(--slate);
+    font-weight: 500;
+  }
+
+  /* Grant card */
+  .grant-card {
+    background: white;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    transition: box-shadow 0.15s, transform 0.15s;
+    cursor: pointer;
+  }
+
+  .grant-card:hover {
+    box-shadow: 0 4px 16px rgba(28,27,24,0.1);
+    transform: translateY(-1px);
+  }
+
+  .grant-card.expanded { box-shadow: 0 4px 20px rgba(28,27,24,0.12); }
+
+  .grant-card-header {
+    display: grid;
+    grid-template-columns: 4px 1fr auto auto;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+  }
+
+  .card-stripe {
+    width: 4px;
+    height: 100%;
+    border-radius: 2px;
+    min-height: 36px;
+    align-self: stretch;
+    margin: -14px -14px -14px 0;
+  }
+
+  .card-stripe.urgent { background: var(--urgent); }
+  .card-stripe.summer { background: var(--mid); }
+  .card-stripe.fall { background: var(--moss); }
+  .card-stripe.next-year { background: var(--slate); }
+  .card-stripe.rolling { background: var(--dark); }
+
+  .card-info { flex: 1; }
+
+  .card-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .card-meta {
+    display: flex;
+    gap: 12px;
+    margin-top: 4px;
+    flex-wrap: wrap;
+  }
+
+  .card-tag {
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-weight: 500;
+    background: var(--mist);
+    color: var(--slate);
+  }
+
+  .card-tag.direct { background: #E8F4E8; color: var(--moss); }
+  .card-tag.partner { background: #FEF3E8; color: var(--mid); }
+  .card-tag.city { background: #EEF0F8; color: var(--slate); }
+
+  .card-amount {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.05rem;
+    color: var(--moss);
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .card-deadline {
+    font-size: 0.72rem;
+    color: var(--slate);
+    text-align: right;
+    margin-top: 2px;
+    white-space: nowrap;
+  }
+
+  .card-deadline.hot { color: var(--urgent); font-weight: 600; }
+
+  .chevron {
+    font-size: 0.8rem;
+    color: var(--slate);
+    transition: transform 0.2s;
+    padding-left: 8px;
+  }
+
+  .grant-card.expanded .chevron { transform: rotate(180deg); }
+
+  /* Expanded detail */
+  .card-detail {
+    display: none;
+    padding: 0 16px 16px;
+    border-top: 1px solid var(--mist);
+    margin-top: 0;
+  }
+
+  .grant-card.expanded .card-detail { display: block; }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 12px;
+  }
+
+  .detail-box {
+    background: var(--mist);
+    border-radius: 6px;
+    padding: 10px 12px;
+  }
+
+  .detail-box label {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--slate);
+    font-weight: 600;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .detail-box p {
+    font-size: 0.8rem;
+    line-height: 1.4;
+  }
+
+  .detail-box.full { grid-column: 1 / -1; }
+
+  .detail-actions {
+    margin-top: 12px;
+    padding: 10px 12px;
+    background: #FFFBF0;
+    border: 1px solid rgba(212,168,71,0.3);
+    border-radius: 6px;
+  }
+
+  .detail-actions label {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--gold);
+    font-weight: 700;
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  .detail-actions p {
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: var(--dark);
+  }
+
+  .contact-link {
+    font-size: 0.75rem;
+    color: var(--terracotta);
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .contact-link:hover { text-decoration: underline; }
+
+  /* Total funding bar */
+  .funding-summary {
+    background: var(--dark);
+    color: var(--cream);
+    padding: 20px 36px;
+    display: flex;
+    gap: 40px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .funding-summary h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.1rem;
+    font-weight: 400;
+  }
+
+  .funding-total {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem;
+    color: var(--gold);
+  }
+
+  .funding-note {
+    font-size: 0.75rem;
+    color: rgba(247,243,236,0.5);
+    max-width: 300px;
+    line-height: 1.5;
+  }
+
+  .hidden { display: none !important; }
+
+  @media (max-width: 700px) {
+    .main { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .stats-bar { flex-wrap: wrap; }
+    .stat { min-width: 50%; }
+    header, .controls, .timeline-container { padding-left: 20px; padding-right: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>SUNI Land Use Committee — <em>Grant Timeline</em></h1>
+  <p>Public Art · Placemaking · Climate Resilience · May 2026</p>
+</header>
+
+<div class="stats-bar">
+  <div class="stat urgent">
+    <div class="num">4</div>
+    <div class="label">Act Now / Open</div>
+  </div>
+  <div class="stat mid">
+    <div class="num">4</div>
+    <div class="label">Summer 2026</div>
+  </div>
+  <div class="stat future">
+    <div class="num">4</div>
+    <div class="label">Fall 2026</div>
+  </div>
+  <div class="stat total">
+    <div class="num">$1M+</div>
+    <div class="label">Total Pool</div>
+  </div>
+</div>
+
+<div class="controls">
+  <span>Show:</span>
+  <button class="filter-btn active" onclick="filterCards('all', this)">All Grants</button>
+  <button class="filter-btn" onclick="filterCards('direct', this)">SUNI Direct</button>
+  <button class="filter-btn" onclick="filterCards('partner', this)">Needs Partner</button>
+  <button class="filter-btn" onclick="filterCards('urgent', this)">Act Now</button>
+</div>
+
+<div class="main">
+
+  <aside class="sidebar">
+    <h3>Timing Legend</h3>
+
+    <div class="legend-item">
+      <div class="legend-dot" style="background:var(--urgent)"></div>
+      <div class="legend-text">
+        <strong>Act Now / Open</strong>
+        <span>Windows open today — apply or initiate immediately</span>
+      </div>
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:var(--mid)"></div>
+      <div class="legend-text">
+        <strong>Summer 2026</strong>
+        <span>Deadlines June–August; begin prep now</span>
+      </div>
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:var(--moss)"></div>
+      <div class="legend-text">
+        <strong>Fall 2026</strong>
+        <span>Sept–Nov windows; primary PSYAH cycle</span>
+      </div>
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:var(--slate)"></div>
+      <div class="legend-text">
+        <strong>Early 2027</strong>
+        <span>Plan now, apply when cycles reopen</span>
+      </div>
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:var(--dark)"></div>
+      <div class="legend-text">
+        <strong>Rolling / Ongoing</strong>
+        <span>No fixed deadline — apply anytime</span>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <h3>Parallel Tracks — Do Now</h3>
+      <div class="action-item">
+        <strong>📸 Document locations</strong>
+        <span>Photo every empty tree hole, planter, broken stub. Required for ALL applications.</span>
+      </div>
+      <div class="action-item">
+        <strong>🤝 Recruit arts org partner</strong>
+        <span>SUNI is a 501(c)(3) and qualifies directly for most grants. NEA Our Town + DCCC still require a nonprofit arts org lead (RedLine, Birdseed Collective).</span>
+      </div>
+      <div class="action-item">
+        <strong>🎨 Recruit artist</strong>
+        <span>Named artist strengthens PSYAH and Bloomberg proposals.</span>
+      </div>
+      <div class="action-item">
+        <strong>🏛️ Engage DOTI + CW Sandoval</strong>
+        <span>Bloomberg requires city co-applicant — start relationship now.</span>
+      </div>
+    </div>
+  </aside>
+
+  <div class="timeline-container">
+
+    <!-- ACT NOW -->
+    <div class="phase-block">
+      <div class="phase-header">
+        <div class="phase-label urgent">⚡ Act Now — Open Windows</div>
+        <div class="phase-line"></div>
+        <div class="phase-date">May 2026</div>
+      </div>
+
+      <div class="grant-card" onclick="toggleCard(this)" data-eligibility="direct">
+        <div class="grant-card-header">
+          <div class="card-stripe urgent"></div>
+          <div class="card-info">
+            <div class="card-title">Climate Resilient Neighborhoods Mini Grant</div>
+            <div class="card-meta">
+              <span class="card-tag direct">SUNI Direct ✓</span>
+              <span class="card-tag">City of Denver</span>
+              <span class="card-tag">Green Infrastructure</span>
+            </div>
+          </div>
+          <div>
+            <div class="card-amount">Up to $50K</div>
+            <div class="card-deadline hot">🔴 OPEN NOW — closes when exhausted</div>
+          </div>
+          <div class="chevron">▼</div>
+        </div>
+        <div class="card-detail">
+          <div class="detail-grid">
+            <div class="detail-box">
+              <label>Amount</label>
+              <p>Tier 1: up to $25K (10 awards) · Tier 2: up to $50K (2 awards)</p>
+            </div>
+            <div class="detail-box">
+              <label>Deadline</label>
+              <p>Rolling — closes when funding exhausted. Projects must complete by Dec 31, 2026.</p>
+            </div>
+            <div class="detail-box">
+              <label>Eligibility</label>
+              <p>SUNI qualifies directly as a neighborhood group and 501(c)(3) — strong eligibility position.</p>
+            </div>
+            <div class="detail-box">
+              <label>Contact</label>
+              <p><a class="contact-link" href="mailto:taylor.moellers@denvergov.org">taylor.moellers@denvergov.org</a></p>
+            </div>
+            <div class="detail-box full">
+              <label>Sunnyside Framing</label>
+              <p>Native plant installations in empty tree holes/planters = urban heat island mitigation + stormwater absorption (green infrastructure). Pedestrian safety improvements on the 38th/Tejon High Injury Network corridor = sustainable transportation + environmental justice.</p>
+            </div>
+          </div>
+          <div class="detail-actions">
+            <label>⚡ Immediate Action</label>
+            <p>Email taylor.moellers@denvergov.org today to confirm eligibility and request application support. This is the most accessible open window right now — rolling awards mean waiting costs you.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="grant-card" onclick="toggleCard(this)" data-eligibility="partner">
+        <div class="grant-card-header">
+          <div class="card-stripe urgent"></div>
+          <div class="card-info">
+            <div class="card-title">NEA Our Town — Creative Placemaking</div>
+            <div class="card-meta">
+              <span class="card-tag partner">Needs Arts Org + Gov Partner</span>
+              <span class="card-tag">National</span>
+              <span class="card-tag">1:1 Match Required</span>
+            </div>
+          </div>
+          <div>
+            <div class="card-amount">$25K–$150K</div>
+            <div class="card-deadline hot">🔴 July 9, 2026</div>
+          </div>
+          <div class="chevron">▼</div>
+        </div>
+        <div class="card-detail">
+          <div class="detail-grid">
+            <div class="detail-box">
+              <label>Amount</label>
+              <p>$25,000–$150,000 with 1:1 nonfederal match required</p>
+            </div>
+            <div class="detail-box">
+              <label>Deadline</label>
+              <p>July 9, 2026 (also February annually)</p>
+            </div>
+            <div class="detail-box">
+              <label>Eligibility</label>
+              <p>NEA specifically requires a nonprofit arts org as lead applicant (RedLine, Birdseed Collective) + a government or community development partner (DOTI or CW Sandoval's office). SUNI's 501(c)(3) status strengthens the partnership but doesn't replace the arts org lead requirement. Match can be in-kind, business sponsorships, or stacked grants.</p>
+            </div>
+            <div class="detail-box">
+              <label>Contact</label>
+              <p><a class="contact-link" href="https://www.arts.gov/grants/our-town" target="_blank">arts.gov/grants/our-town</a></p>
+            </div>
+            <div class="detail-box full">
+              <label>Sunnyside Framing</label>
+              <p>NEA has specifically prioritized projects addressing transportation/infrastructure challenges. The 38th & Tejon High Injury Network corridor with documented July 2025 fatality is a strong narrative fit for this federal placemaking grant.</p>
+            </div>
+          </div>
+          <div class="detail-actions">
+            <label>⚡ Immediate Action</label>
+            <p>Contact RedLine Contemporary Art Center this week about co-leading the application. Contact DOTI (Brendan Kelly / Nicholas Williams) about serving as government partner. July 9 is ~6 weeks away — this is a tight turnaround requiring parallel outreach now.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="grant-card" onclick="toggleCard(this)" data-eligibility="direct">
+        <div class="grant-card-header">
+          <div class="card-stripe urgent"></div>
+          <div class="card-info">
+            <div class="card-title">Arts in Society Grant — RedLine / Colorado Creative Industries</div>
+            <div class="card-meta">
+              <span class="card-tag direct">SUNI Direct ✓</span>
+              <span class="card-tag">Colorado Statewide</span>
+              <span class="card-tag">No Match Required</span>
+            </div>
+          </div>
+          <div>
+            <div class="card-amount">$5K–$35K</div>
+            <div class="card-deadline hot">⚠ April annually — verify if still open</div>
+          </div>
+          <div class="chevron">▼</div>
+        </div>
+        <div class="card-detail">
+          <div class="detail-grid">
+            <div class="detail-box">
+              <label>Amount</label>
+              <p>$5,000–$35,000 · No matching funds required</p>
+            </div>
+            <div class="detail-box">
+              <label>Deadline</label>
+              <p>April annually — check redlineart.org for exact 2026 status</p>
+            </div>
+            <div class="detail-box">
+              <label>Eligibility</label>
+              <p>Any Colorado resident, org, or nonprofit. No arts focus required. SUNI can apply directly or an individual member can apply.</p>
+            </div>
+            <div class="detail-box">
+              <label>Contact</label>
+              <p><a class="contact-link" href="https://www.redlineart.org/ais-apply-for-a-grant" target="_blank">redlineart.org/ais-apply-for-a-grant</a></p>
+            </div>
+            <div class="detail-box full">
+              <label>Sunnyside Framing</label>
+              <p>Projects must integrate arts + culture with another discipline to address a social issue. Frame streetscape/infrastructure neglect as community health and equity — especially compelling given HIN corridor and documented fatality. Grantees also receive mini-documentary production + social media promotion.</p>
+            </div>
+          </div>
+          <div class="detail-actions">
+            <label>⚡ Immediate Action</label>
+            <p>Check redlineart.org now to confirm whether the 2026 cycle is still open. If so, apply immediately — this is the lightest-lift direct grant available and the memo flags it as a strong fit.</p>
+          </div>
+        </div>
+      </div>
+      <div class="grant-card" onclick="toggleCard(this)" data-eligibility="direct">
+        <div class="grant-card-header">
+          <div class="card-stripe rolling"></div>
+          <div class="card-info">
+            <div class="card-title">CTC Community Forestry Grant — Colorado Tree Coalition</div>
+            <div class="card-meta">
+              <span class="card-tag direct">SUNI Direct ✓</span>
+              <span class="card-tag">Colorado Statewide</span>
+              <span class="card-tag">Rolling — No Deadline</span>
+            </div>
+          </div>
+          <div>
+            <div class="card-amount">$1K–$8K</div>
+            <div class="card-deadline hot">🟢 Open Year-Round</div>
+          </div>
+          <div class="chevron">▼</div>
+        </div>
+        <div class="card-detail">
+          <div class="detail-grid">
+            <div class="detail-box">
+              <label>Amount</label>
+              <p>$1,000–$8,000 · Requires equal cash match (grant covers 50% of total tree-related cash expenditures up to approved amount)</p>
+            </div>
+            <div class="detail-box">
+              <label>Deadline</label>
+              <p>Rolling — applications open year-round, no fixed deadline. LOI reviewed as received.</p>
+            </div>
+            <div class="detail-box">
+              <label>Eligibility</label>
+              <p>Local governments, districts, or nonprofit organizations. SUNI qualifies directly as a 501(c)(3). Projects must occur on public property or demonstrate clear community benefit (streets, easements, publicly accessible spaces).</p>
+            </div>
+            <div class="detail-box">
+              <label>Contact</label>
+              <p><a class="contact-link" href="mailto:programadmin@coloradotrees.org">programadmin@coloradotrees.org</a></p>
+            </div>
+            <div class="detail-box full">
+              <label>Sunnyside Framing</label>
+              <p>Empty tree holes and missing street trees along 38th Ave, 41st/Tejon, and 44th/Zuni corridors = direct urban canopy gap on public right-of-way. Frame as urban heat island mitigation, canopy equity, and species diversity in an underserved corridor. The cash match requirement can be met through in-kind volunteer labor, donated materials, or stacked with the Climate Resilient Neighborhoods grant.</p>
+            </div>
+          </div>
+          <div class="detail-actions">
+            <label>⚡ Immediate Action</label>
+            <p>Submit a one-page LOI to programadmin@coloradotrees.org — no deadline, so this can move the moment location documentation is in hand. Include: contact info, FEIN, project description (street tree planting in empty holes on HIN corridor), budget estimate, and funding amount requested. Grant Committee reviews and assigns a liaison if interested.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SUMMER 2026 -->
+    <div class="phase-block">
+      <div class="phase-header">
+        <div class="phase-label summer">☀ Summer 2026</div>
+        <div class="phase-line"></div>
+        <div class="phase-date">June – August 2026</div>
+      </div>
+
+      <div class="grant-card" onclick="toggleCard(this)" data-eligibility="direct">
+        <div class="grant-card-header">
+          <div class="card-stripe summer"></div>
+          <div class="card-info">
+            <div class="card-title">DENVER CREATES Fund</div>
+            <div class="card-meta">
+              <span class="card-tag direct">SUNI Direct ✓</span>
+              <span class="card-tag">Denver Arts & Venues</span>
+              <span class="card-tag">Lighter Lift</span>
+            </div>
+          </div>
+          <div>
+            <div class="card-amount">Up to $10K</div>
+            <div class="card-deadline">Summer 2026 deadline</div>
+          </div>
+          <div class="chevron">▼</div>
+        </div>
+        <div class="card-detail">
+          <div class="detail-grid">
+            <div class="detail-box">
+              <label>Amount</label>
+              <p>Up to $10,000</p>
+            </div>
+            <div class="detail-box">
+              <label>Deadline</label>
+              <p>Summer 2026 — exact date TBD. Programs Sept 2025–Dec 2026.</p>
+            </div>
+            <div class="detail-box">
+              <label>Eligibility</label>
+              <p>Denver-based organizations and collectives. SUNI qualifies directly.</p>
+            </div>
+            <div class="detail-box">
+              <label>Why It Matters</label>
+              <p>Good entry point to establish a relationship with Denver Arts & Venues before the October PSYAH cycle. A successful Denver CREATES application builds credibility for the bigger ask.</p>
+            </div>
+          </div>
+          <div class="detail-actions">
+            <label>Strategic Play</label>
+            <p>File this as the warm-up to PSYAH. A relationship with DAV staff (Michael Chavez, Lisa Gedgaudas) before the fall cycle opens is worth as much as the $10K. Must align with Denver CREATES goals around arts access and cultural vitality.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="grant-card" onclick="toggleCard(this)" data-eligibility="direct">
+        <div class="grant-card-header">
+          <div class="card-stripe summer"></div>
+          <div class="card-info">
+            <div class="card-title">EDI Mini Grants — Denver Arts & Venues</div>
+            <div class="card-meta">
+              <span class="card-tag direct">SUNI Direct ✓</span>
+              <span class="card-tag">Rolling</span>
+              <span class="card-tag">Fast + Flexible</span>
+            </div>
+          </div>
+          <div>
+            <div class="card-amount">Up to $3K</div>
+            <div class="card-deadline">Rolling — anytime</div>
+          </div>
+          <div class="chevron">▼</div>
+        </div>
+        <div class="card-detail">
+          <div class="detail-grid">
+            <div class="detail-box">
+              <label>Amount</label>
+              <p>Up to $3,000</p>
+            </div>
+            <div class="detail-box">
+              <label>Deadline</label>
+              <p>Rolling — participatory grant-making model; decisions by the communities the fund aims to support</p>
+            </div>
+            <div class="detail-box">
+              <label>Eligibility</label>
+              <p>Individuals and community organizations. Must center communities represented by Denver Human Rights Commissions.</p>
+            </div>
+            <div class="detail-box">
+              <label>Use Case</label>
+              <p>Best fit for community activation events tied to the streetscape campaign — a planting day, a mural unveiling, a neighborhood gathering.</p>
+            </div>
+          </div>
+          <div class="detail-actions">
+            <label>Strategic Play</label>
+            <p>Small but fast and flexible. Use to fund a community activation event that generates documentation, photos, and community buy-in — all of which strengthen the PSYAH proposal narrative.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="grant-card" onclick="toggleCard(this)" data-eligibility="direct">
+        <div class="grant-card-header">
+          <div class="card-stripe summer"></div>
+          <div class="card-info">
+            <div class="card-title">Mile High Weaver Awards — Denver INC / Aspen Institute</div>
+            <div class="card-meta">
+              <span class="card-tag direct">SUNI Direct ✓</span>
+              <span class="card-tag">Denver Local</span>
+              <span class="card-tag">Relational Funder</span>
+            </div>
+          </div>
+          <div>
+            <div class="card-amount">$2,500</div>
+            <div class="card-deadline hot">🟢 Open — launched June 19</div>
+          </div>
+          <div class="chevron">▼</div>
+        </div>
+        <div class="card-detail">
+          <div class="detail-grid">
+            <div class="detail-box">
+              <label>Amount</label>
+              <p>$2,500 microgrant · Distributed annually as part of a 4-year national initiative</p>
+            </div>
+            <div class="detail-box">
+              <label>Deadline</label>
+              <p>First cycle launched June 19, 2026 — no close date listed. Apply now via awards.weavers.org/en/denver/2026</p>
+            </div>
+            <div class="detail-box">
+              <label>Eligibility</label>
+              <p>Individuals and small community-based organizations in Denver doing relationship-centered work. Must demonstrate ongoing, sustained community engagement — not one-time events. Work must bring people together across differences.</p>
+            </div>
+            <div class="detail-box">
+              <label>Contact</label>
+              <p><a class="contact-link" href="mailto:weave@denverinc.org">weave@denverinc.org</a></p>
+            </div>
+            <div class="detail-box full">
+              <label>Sunnyside Framing</label>
+              <p>This is a different kind of grant — it funds the <em>weaver</em>, not just the project. SUNI's work connecting longtime residents, newer neighbors, local businesses, and city agencies around shared infrastructure and placemaking is a textbook weaving story. The Sunnyside Music Festival's 20-year community-building history, guerrilla gardening, and the Land Use Committee's role as a trusted neighborhood intermediary all speak to sustained, relationship-centered work. Frame around a specific person or the committee as a whole — not just the grant project.</p>
+            </div>
+          </div>
+          <div class="detail-actions">
+            <label>⚡ Immediate Action</label>
+            <p>Email weave@denverinc.org to introduce SUNI and ask about eligibility for the current cycle. Apply at awards.weavers.org/en/denver/2026. This is the lowest-dollar grant on the board but connects SUNI to a national network (Aspen Institute) and opens doors to future relational funders like community foundations. Worth the light lift.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="grant-card" onclick="toggleCard(this)" data-eligibility="partner">
+        <div class="grant-card-header">
+          <div class="card-stripe summer"></div>
+          <div class="card-info">
+            <div class="card-title">Begin Bloomberg Asphalt Art — Partner Conversations</div>
+            <div class="card-meta">
+              <span class="card-tag city">City Must Apply</span>
+              <span class="card-tag">National</span>
+              <span class="card-tag">Prep for Jan 2027</span>
+            </div>
+          </div>
+          <div>
+            <div class="card-amount">Up to $100K</div>
+            <div class="card-deadline">Jan 2027 deadline — start now</div>
+          </div>
+          <div class="chevron">▼</div>
+        </div>
+        <div class="card-detail">
+          <div class="detail-grid">
+            <div class="detail-box">
+              <label>Amount</label>
+              <p>Up to $100,000</p>
+            </div>
+            <div class="detail-box">
+              <label>Deadline</label>
+              <p>January 2027 annually — closed for 2026</p>
+            </div>
+            <div class="detail-box">
+              <label>Eligibility</label>
+              <p>City of Denver must be the applicant (population 50,000+). Neighborhood drives proposal content; city submits.</p>
+            </div>
+            <div class="detail-box">
+              <label>Project Concept</label>
+              <p>Painted crosswalks + roadway art + utility box wraps at 38th & Tejon — the documented fatality site on a High Injury Network corridor.</p>
+            </div>
+          </div>
+          <div class="detail-actions">
+            <label>Summer Prep Action</label>
+            <p>Engage DOTI (Brendan Kelly) and CW Sandoval's office now about whether Denver would submit on SUNI's behalf for January 2027. The 38th & Tejon framing makes this compelling — but city buy-in takes time to cultivate.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FALL 2026 -->
+    <div class="phase-block">
+      <div class="phase-header">
+        <div class="phase-label fall">🍂 Fall 2026 — Primary PSYAH Cycle</div>
+        <div class="phase-line"></div>
+        <div class="phase-date">September – November 2026</div>
+      </div>
+
+      <div class="grant-card" onclick="toggleCard(this)" data-eligibility="direct">
+        <div class="grant-card-header">
+          <div class="card-stripe fall"></div>
+          <div class="card-info">
+            <div class="card-title">★ P.S. You Are Here (PSYAH) — PRIMARY TARGET</div>
+            <div class="card-meta">
+              <span class="card-tag direct">SUNI Direct ✓</span>
+              <span class="card-tag">Denver Arts & Venues</span>
+              <span class="card-tag">Best Fit</span>
+            </div>
+          </div>
+          <div>
+            <div class="card-amount">~$100K pool</div>
+            <div class="card-deadline">Oct–Nov 2026 (est.)</div>
+          </div>
+          <div class="chevron">▼</div>
+        </div>
+        <div class="card-detail">
+          <div class="detail-grid">
+            <div class="detail-box">
+              <label>Amount</label>
+              <p>~$100,000 pool (individual awards vary)</p>
+            </div>
+            <div class="detail-box">
+              <label>Deadline</label>
+              <p>2026–2027 cycle expected to open October 2026. 2025–2026 cycle closed Nov 2025. Monitor artsandvenuesdenver.com.</p>
+            </div>
+            <div class="detail-box">
+              <label>Eligibility</label>
+              <p>RNOs are explicitly listed as eligible applicants. SUNI qualifies directly both as an RNO and as a 501(c)(3) — a stronger applicant profile than most neighborhood orgs.</p>
+            </div>
+            <div class="detail-box">
+              <label>Contact</label>
+              <p><a class="contact-link" href="mailto:michael.chavez@denvergov.org">Michael Chavez</a> · <a class="contact-link" href="mailto:lisa.gedgaudas@denvergov.org">Lisa Gedgaudas</a></p>
+            </div>
+            <div class="detail-box full">
+              <label>Direct Precedents for Sunnyside</label>
+              <p>PSYAH previously funded: (1) a planter repurposing project on Larimer St in RiNo for city-installed planters abandoned post-16th Mall reconstruction, and (2) a mini-mural jam on planter boxes on Santa Fe. Both are direct analogues for SUNI's empty planters and broken infrastructure on 38th Ave, 41st/Tejon, and 44th/Zuni.</p>
+            </div>
+          </div>
+          <div class="detail-actions">
+            <label>Build Toward This All Summer</label>
+            <p>Everything from June–September feeds this application: location documentation, artist recruitment, Denver CREATES relationship with DAV, community activation events, and any prior grant wins (Climate Resilient, EDI) that demonstrate momentum. Sign up for DAV email updates now to catch the opening announcement.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="grant-card" onclick="toggleCard(this)" data-eligibility="partner">
+        <div class="grant-card-header">
+          <div class="card-stripe fall"></div>
+          <div class="card-info">
+            <div class="card-title">DCCC Discretionary (EDI) — Denver Arts & Venues</div>
+            <div class="card-meta">
+              <span class="card-tag partner">Needs Arts Org Partner</span>
+              <span class="card-tag">Denver Arts & Venues</span>
+            </div>
+          </div>
+          <div>
+            <div class="card-amount">Varies</div>
+            <div class="card-deadline">October 1, 2026</div>
+          </div>
+          <div class="chevron">▼</div>
+        </div>
+        <div class="card-detail">
+          <div class="detail-grid">
+            <div class="detail-box">
+              <label>Deadline</label>
+              <p>October 1, 2026</p>
+            </div>
+            <div class="detail-box">
+              <label>Eligibility</label>
+              <p>Tier III arts organizations only. SUNI must partner with an eligible arts org (e.g., RedLine Contemporary Art Center).</p>
+            </div>
+            <div class="detail-box full">
+              <label>Sunnyside Framing</label>
+              <p>Focuses on equity-centered programming. Strong fit if the project has cultural/historical framing tied to Sunnyside's neighborhood identity — early 20th-century development, 38th Ave as commercial corridor, demographic history. Best pursued with a RedLine partnership already in place from NEA Our Town work.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grant-card" onclick="toggleCard(this)" data-eligibility="direct">
+        <div class="grant-card-header">
+          <div class="card-stripe fall"></div>
+          <div class="card-info">
+            <div class="card-title">Colorado Urban & Community Forestry Grant — CSFS / USDA Forest Service</div>
+            <div class="card-meta">
+              <span class="card-tag direct">SUNI Direct ✓</span>
+              <span class="card-tag">Colorado / Federal</span>
+              <span class="card-tag">No Match Required</span>
+            </div>
+          </div>
+          <div>
+            <div class="card-amount">$50K–$200K</div>
+            <div class="card-deadline hot">🔴 September 21, 2026</div>
+          </div>
+          <div class="chevron">▼</div>
+        </div>
+        <div class="card-detail">
+          <div class="detail-grid">
+            <div class="detail-box">
+              <label>Amount</label>
+              <p>Tier 1: $50,000–$100,000 · Tier 2: $100,001–$200,000 · Total pool: $700,000 · No matching funds required · Projects complete by Dec 31, 2028</p>
+            </div>
+            <div class="detail-box">
+              <label>Deadline</label>
+              <p>Application opened July 21, 2026. Closes September 21, 2026. Award announcement October 30, 2026.</p>
+            </div>
+            <div class="detail-box">
+              <label>Eligibility</label>
+              <p>Nonprofits and local government entities. SUNI qualifies directly as a 501(c)(3). Must have active SAM/UEI registration — verify or register at sam.gov before applying.</p>
+            </div>
+            <div class="detail-box">
+              <label>Contact</label>
+              <p>Carrie Tomlinson, UCF Program Manager · <a class="contact-link" href="mailto:CSFS_UCF@colostate.edu">CSFS_UCF@colostate.edu</a> · 405-204-8985</p>
+            </div>
+            <div class="detail-box full" style="border-left: 3px solid var(--urgent); background: #FFF5F5;">
+              <label style="color: var(--urgent);">⚠ Denver-Specific Restriction</label>
+              <p>Projects within the City of Denver are <strong>limited to private property only</strong> due to prior grant cycles already funding Denver public land. Street trees, Chaffee Park plantings, and public ROW corridor work do not qualify. The use case for SUNI shifts to: residential lots along corridors with documented canopy gaps, and private business properties on 38th Ave, 41st/Tejon, or 44th/Zuni.</p>
+            </div>
+            <div class="detail-box full">
+              <label>Sunnyside Framing (Private Property Angle)</label>
+              <p>Frame around residential lot tree planting along corridors where tree canopy is below 20% — a criterion most of North Denver meets. Priority is given to communities with less than 20% canopy cover, areas with safety/hazard tree removal needs, and projects integrating inventories with planting. A corridor-scale private property tree planting program (e.g., 38th Ave residential lots between Federal and Tejon) with a community engagement and education component fits cleanly. Eligible activities: tree planting, strategic pruning, tree removal, urban forest inventory, capacity building, community outreach.</p>
+            </div>
+          </div>
+          <div class="detail-actions">
+            <label>⚡ Immediate Action</label>
+            <p>Confirm SUNI has an active SAM/UEI registration (required). Contact Carrie Tomlinson at CSFS_UCF@colostate.edu to confirm that a residential/private property corridor tree planting program in Denver qualifies under the current cycle rules. Deadline is September 21 — 8 weeks from now. This is the largest grant on the board by award size.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="grant-card" onclick="toggleCard(this)" data-eligibility="direct">
+        <div class="grant-card-header">
+          <div class="card-stripe fall"></div>
+          <div class="card-info">
+            <div class="card-title">History Colorado — State Historical Fund (2027 cycle opens)</div>
+            <div class="card-meta">
+              <span class="card-tag direct">SUNI Direct ✓</span>
+              <span class="card-tag">Colorado Statewide</span>
+              <span class="card-tag">Competitive</span>
+            </div>
+          </div>
+          <div>
+            <div class="card-amount">$10K–$750K</div>
+            <div class="card-deadline">2027 cycle opens fall 2026</div>
+          </div>
+          <div class="chevron">▼</div>
+        </div>
+        <div class="card-detail">
+          <div class="detail-grid">
+            <div class="detail-box">
+              <label>Deadline</label>
+              <p>Letter of Intent: March 2026 (past for 2026). 2027 cycle opens fall 2026 — prepare LOI now.</p>
+            </div>
+            <div class="detail-box">
+              <label>Eligibility</label>
+              <p>Nonprofits, government agencies, and community orgs. SUNI qualifies directly as a 501(c)(3). Requires strong historic documentation — begin neighborhood history research this summer.</p>
+            </div>
+            <div class="detail-box full">
+              <label>Sunnyside Fit</label>
+              <p>Relevant if project incorporates historic preservation, neighborhood heritage documentation, or interpretive installations. Sunnyside has real history: early 20th-century development, 38th Ave as a commercial corridor, demographic changes on Tejon/Zuni. A historical signage, mural, or interpretive art installation with a research component could qualify. Begin documentation work this summer.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2027 -->
+    <div class="phase-block">
+      <div class="phase-header">
+        <div class="phase-label next-year">📅 Early 2027 — Plan Now</div>
+        <div class="phase-line"></div>
+        <div class="phase-date">January – March 2027</div>
+      </div>
+
+      <div class="grant-card" onclick="toggleCard(this)" data-eligibility="partner">
+        <div class="grant-card-header">
+          <div class="card-stripe next-year"></div>
+          <div class="card-info">
+            <div class="card-title">Bloomberg Philanthropies — Asphalt Art Initiative</div>
+            <div class="card-meta">
+              <span class="card-tag city">City Must Apply</span>
+              <span class="card-tag">National</span>
+            </div>
+          </div>
+          <div>
+            <div class="card-amount">Up to $100K</div>
+            <div class="card-deadline">January 2027</div>
+          </div>
+          <div class="chevron">▼</div>
+        </div>
+        <div class="card-detail">
+          <div class="detail-grid">
+            <div class="detail-box">
+              <label>Amount</label>
+              <p>Up to $100,000</p>
+            </div>
+            <div class="detail-box">
+              <label>Deadline</label>
+              <p>January annually — closed for 2026. Begin cultivating DOTI/city relationship now.</p>
+            </div>
+            <div class="detail-box full">
+              <label>Project Concept + Strategy</label>
+              <p>Visual art on roadways at 38th & Tejon — painted crosswalks, utility box wraps, roadway art at the documented fatality site. Denver must apply, but neighborhoods drive proposals. The High Injury Network + fatality framing is compelling for this grant. Requires DOTI and CW Sandoval buy-in by fall 2026.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grant-card" onclick="toggleCard(this)" data-eligibility="direct">
+        <div class="grant-card-header">
+          <div class="card-stripe next-year"></div>
+          <div class="card-info">
+            <div class="card-title">AARP Community Challenge</div>
+            <div class="card-meta">
+              <span class="card-tag direct">SUNI Direct ✓</span>
+              <span class="card-tag">National</span>
+            </div>
+          </div>
+          <div>
+            <div class="card-amount">$500–$25K</div>
+            <div class="card-deadline">March 2027</div>
+          </div>
+          <div class="chevron">▼</div>
+        </div>
+        <div class="card-detail">
+          <div class="detail-grid">
+            <div class="detail-box">
+              <label>Amount</label>
+              <p>Flagship: $500–$15K · Demonstration: $10K–$25K · Microgrant: $2,500</p>
+            </div>
+            <div class="detail-box">
+              <label>Deadline</label>
+              <p>March annually — opens January 2027. Closed for 2026.</p>
+            </div>
+            <div class="detail-box">
+              <label>Eligibility</label>
+              <p>501(c)(3), (c)(4), or (c)(6) nonprofits or government entities. SUNI qualifies directly as a 501(c)(3). No co-applicant required — apply as lead.</p>
+            </div>
+            <div class="detail-box">
+              <label>Precedent</label>
+              <p>Funded the Rogers Park, Chicago pothole mosaic tile art project at $7,500 — a near-perfect analogue for the Sunnyside broken infrastructure mosaic concept.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grant-card" onclick="toggleCard(this)" data-eligibility="direct">
+        <div class="grant-card-header">
+          <div class="card-stripe next-year"></div>
+          <div class="card-info">
+            <div class="card-title">Project for Public Spaces — Placemaking Grants</div>
+            <div class="card-meta">
+              <span class="card-tag direct">SUNI Direct ✓</span>
+              <span class="card-tag">National</span>
+              <span class="card-tag">+ Technical Assistance</span>
+            </div>
+          </div>
+          <div>
+            <div class="card-amount">$5K–$50K</div>
+            <div class="card-deadline">Watch for mid-2026 cycle</div>
+          </div>
+          <div class="chevron">▼</div>
+        </div>
+        <div class="card-detail">
+          <div class="detail-grid">
+            <div class="detail-box">
+              <label>Amount</label>
+              <p>$5,000–$50,000 + technical assistance from PPS staff</p>
+            </div>
+            <div class="detail-box">
+              <label>Deadline</label>
+              <p>Varies by funder partner (GM, Walton Foundation). 2026 cycle recently closed — check pps.org for new cycles mid-to-late 2026.</p>
+            </div>
+            <div class="detail-box full">
+              <label>Value Beyond Funding</label>
+              <p>PPS provides direct technical assistance, leadership development, and placemaking expertise alongside the grant. For a neighborhood building its first major placemaking campaign, the expertise may be as valuable as the dollars. Monitor pps.org regularly.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="funding-summary">
+  <div>
+    <h3>Total Funding Pool Identified</h3>
+    <div class="funding-total">$1M+</div>
+  </div>
+  <div class="funding-note">
+    Across 12 grants tracked. Realistic near-term target: $25K–$75K in 2026 through Climate Resilient + Denver CREATES + Arts in Society, building toward a $70K+ PSYAH application in October.
+  </div>
+  <div class="funding-note" style="border-left: 2px solid rgba(212,168,71,0.4); padding-left: 16px;">
+    <strong style="display:block; margin-bottom:4px; color: var(--gold);">Longer-Term Mechanism</strong>
+    BID/GID formation on 38th + 44th Ave corridors would create permanent self-funded maintenance. Formation requires ≥35% property owner petition + City Council approval.
+  </div>
+</div>
+
+<script>
+  function toggleCard(card) {
+    card.classList.toggle('expanded');
+  }
+
+  function filterCards(type, btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    const cards = document.querySelectorAll('.grant-card');
+    cards.forEach(card => {
+      if (type === 'all') {
+        card.classList.remove('hidden');
+      } else if (type === 'urgent') {
+        const isUrgent = card.querySelector('.card-stripe.urgent') !== null;
+        card.classList.toggle('hidden', !isUrgent);
+      } else {
+        const eligibility = card.dataset.eligibility;
+        card.classList.toggle('hidden', eligibility !== type);
+      }
+    });
+
+    // Show/hide phase blocks if all cards hidden
+    document.querySelectorAll('.phase-block').forEach(block => {
+      const visibleCards = block.querySelectorAll('.grant-card:not(.hidden)');
+      block.style.display = visibleCards.length === 0 ? 'none' : '';
+    });
+  }
+</script>
+
+</body>
+</html>
